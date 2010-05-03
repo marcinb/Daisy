@@ -5,9 +5,10 @@
     private $_parts;
     private $_params;
     
-    public function __construct(){
+    public function __construct($method, $pattern, Closure $callback, Array $conditions = null){
       $this->_parts = array();
       $this->_params = array();
+      $this->build($method, $pattern, $callback, $conditions);
     }
     
     public function getMethod(){

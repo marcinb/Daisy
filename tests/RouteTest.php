@@ -6,20 +6,16 @@ class RouteTest extends PHPUnit_Framework_TestCase
 {
   protected $route;
   
-  protected function setUp(){
-    $this->route = new DaisyRoute();
-  }
-  
   public function testBuildShouldSetMethod()
   {
-    $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->getMethod(), 'GET');
+    $route = new DaisyRoute('GET', '/hello', function(){});
+    $this->assertEquals($route->getMethod(), 'GET');
   }
   
   public function testBuildShouldSetPartsWithoutConditionsGiven()
   {
-    $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->getParts(), array(
+    $route = new DaisyRoute('GET', '/hello', function(){});
+    $this->assertEquals($route->getParts(), array(
       array('pattern' => '/^$/', 'wildcard' => null),
       array('pattern' => '/^hello$/', 'wildcard' => null)
     ));
@@ -27,8 +23,8 @@ class RouteTest extends PHPUnit_Framework_TestCase
   
   public function testBuildShouldSetPartsWithConditionsGiven()
   {
-    $this->route->build('GET', '/say/:what/to/:id', function(){}, array(':id' => '[0-9]+'));
-    $this->assertEquals($this->route->getParts(), array(
+    $route = new DaisyRoute('GET', '/say/:what/to/:id', function(){}, array(':id' => '[0-9]+'));
+    $this->assertEquals($route->getParts(), array(
       array('pattern' => '/^$/', 'wildcard' => null),
       array('pattern' => '/^say$/', 'wildcard' => null),
       array('pattern' => null, 'wildcard' => ':what'),
@@ -39,55 +35,55 @@ class RouteTest extends PHPUnit_Framework_TestCase
   
   public function testBuildShouldSetCallback()
   {
-    $this->route->build('GET', '/hello', function(){ 
+    $route = new DaisyRoute('GET', '/hello', function(){ 
       return "I'm callback"; 
     });
-    $this->assertEquals($this->route->fireCallback(), "I'm callback");
+    $this->assertEquals($route->fireCallback(), "I'm callback");
   }
   
   public function testMatchesShouldBeTrue()
   {
-    $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->matches('GET', '/hello'), true);
+    $route = new DaisyRoute('GET', '/hello', function(){});
+    $this->assertEquals($route->matches('GET', '/hello'), true);
   }
   
   public function testMatchesShouldBeFalseWhenMethodDoesNotMatch()
   {
-    $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->matches('POST', '/hello'), false);
+    $route = new DaisyRoute('GET', '/hello', function(){});
+    $this->assertEquals($route->matches('POST', '/hello'), false);
   }
   
   public function testMatchesShouldBeFalseWhenPartsCountDifferent()
   {
-    $this->route->build('GET', '/first/second', function(){});
-    $this->assertEquals($this->route->matches('POST', '/first'), false);
-    $this->route->build('GET', '/first', function(){});
-    $this->assertEquals($this->route->matches('POST', '/first/second'), false);
+    $route = new DaisyRoute('GET', '/first/second', function(){});
+    $this->assertEquals($route->matches('POST', '/first'), false);
+    $route->build('GET', '/first', function(){});
+    $this->assertEquals($route->matches('POST', '/first/second'), false);
   }
   
   public function testMatchesShouldBeFalseWhenPatternDoesNotMatch()
   {
-    $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->matches('GET', '/wrong'), false);
+    $route = new DaisyRoute('GET', '/hello', function(){});
+    $this->assertEquals($route->matches('GET', '/wrong'), false);
   }
   
   public function testMatchesShouldBeTrueWhenConditionsMet()
   {
-    $this->route->build('GET', '/hello/:id', function(){}, array(':id' => '[0-9]+'));
-    $this->assertEquals($this->route->matches('GET', '/hello/21'), true);
+    $route = new DaisyRoute('GET', '/hello/:id', function(){}, array(':id' => '[0-9]+'));
+    $this->assertEquals($route->matches('GET', '/hello/21'), true);
   }
   
   public function testMatchesShouldBeFalseWhenConditionsNotMet()
   {
-    $this->route->build('GET', '/hello/:id', function(){}, array(':id' => '[0-9]+'));
-    $this->assertEquals($this->route->matches('GET', '/hello/21a43'), false);
+    $route = new DaisyRoute('GET', '/hello/:id', function(){}, array(':id' => '[0-9]+'));
+    $this->assertEquals($route->matches('GET', '/hello/21a43'), false);
   }
   
   public function testShouldGetParams()
   {
-    $this->route->build('GET', '/hello/:id/:name', function(){}, array(':id' => '[0-9]+'));
-    $this->route->matches('GET', '/hello/21/Tom');
-    $params = $this->route->getParams();
+    $route = new DaisyRoute('GET', '/hello/:id/:name', function(){}, array(':id' => '[0-9]+'));
+    $route->matches('GET', '/hello/21/Tom');
+    $params = $route->getParams();
     $this->assertEquals($params[':id'], '21');
     $this->assertEquals($params[':name'], 'Tom');
   }
