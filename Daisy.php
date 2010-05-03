@@ -33,8 +33,9 @@
       // eg. $pattern = '/hello/:id' with $conditions = array(':id' => '[0-9]+')
       // produces: 
       // $parts = array(
-      //   0 => array('pattern' => 'hello', 'condition' => null)
-      //   1 => array('pattern' => ':id', 'condition' => '[0-9]+') )
+      //   0 => array('pattern' => '/^$/', 'wildcard' => null)
+      //   1 => array('pattern' => '/^hello$/', 'wildcard' => null)
+      //   2 => array('pattern' => '/^[0-9]+$/', 'wildcard' => ':id') )
       foreach(explode('/', $pattern) as $part){
         $route = array();
         $wildcard = null;
