@@ -1,5 +1,5 @@
 <?php
-  class Route {
+  class DaisyRoute {
     private $_method;
     private $_callback;
     private $_parts;
@@ -36,15 +36,35 @@
       //   0 => array('pattern' => 'hello', 'condition' => null)
       //   1 => array('pattern' => ':id', 'condition' => '[0-9]+') )
       foreach(explode('/', $pattern) as $part){
-        if($part != ''){
-          $condition = array_key_exists($part, $conditions) ? $conditions[$part] : null;
-          array_push($this->_parts, array('pattern' => $part, 'condition' => $condition));
+        $route = array();
+        $wildcard = null;
+        
+        // wildcard detected
+        if(preg_match('/^:\w+/', $part)) {
+          $wildcard = $part;
+          $pattern = array_key_exists($part, $conditions) ? '/^' . $conditions[$part] . '$/' : null;
         }
+        else {
+          $pattern = '/^' . $part . '$/';
+        }
+        array_push($this->_parts, array('pattern' => $pattern, 'wildcard' => $wildcard));
       }
     }
     
-    public function matchesAgainst($path){
+    public function match($method, $pattern) {
+      if($this->getMethod() != $method) { return false; }
       
+      $pattern_parts = explode('/', $pattern);
+      foreach($this->getParts() as $index => $part){
+        if(!preg_match($part['pattern'], $pattern_parts[$index])){
+          return false;
+        }
+      }
+      return true;
     }
+  }
+  
+  class Daisy {
+    
   }
 ?>
