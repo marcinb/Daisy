@@ -7,6 +7,7 @@
     
     public function __construct(){
       $this->_parts = array();
+      $this->_params = array();
     }
     
     public function getMethod(){
@@ -15,6 +16,10 @@
     
     public function getParts(){
       return $this->_parts;
+    }
+    
+    public function getParams(){
+      return $this->_params;
     }
     
     public function fireCallback(){
@@ -52,13 +57,18 @@
       }
     }
     
-    public function match($method, $pattern) {
-      if($this->getMethod() != $method) { return false; }
-      
+    public function matches($method, $pattern) {
       $pattern_parts = explode('/', $pattern);
+      
+      if($this->getMethod() != $method) { return false; }
+      if(count($this->getParts()) != count($pattern_parts)) { return false; }
+      
       foreach($this->getParts() as $index => $part){
-        if(!preg_match($part['pattern'], $pattern_parts[$index])){
+        if($part['pattern'] && !preg_match($part['pattern'], $pattern_parts[$index])){
           return false;
+        }
+        if($part['wildcard']){
+          $this->_params[$part['wildcard']] = $pattern_parts[$index];
         }
       }
       return true;

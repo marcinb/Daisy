@@ -45,34 +45,51 @@ class RouteTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($this->route->fireCallback(), "I'm callback");
   }
   
-  public function testMatchPatternShouldBeTrue()
+  public function testMatchesShouldBeTrue()
   {
     $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->match('GET', '/hello'), true);
+    $this->assertEquals($this->route->matches('GET', '/hello'), true);
   }
   
-  public function testMatchPatternShouldBeFalseWhenPatternDoesNotMatch()
+  public function testMatchesShouldBeFalseWhenMethodDoesNotMatch()
   {
     $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->match('GET', '/wrong'), false);
+    $this->assertEquals($this->route->matches('POST', '/hello'), false);
   }
   
-  public function testMatchPatternShouldBeFalseWhenMethodDoesNotMatch()
+  public function testMatchesShouldBeFalseWhenPartsCountDifferent()
+  {
+    $this->route->build('GET', '/first/second', function(){});
+    $this->assertEquals($this->route->matches('POST', '/first'), false);
+    $this->route->build('GET', '/first', function(){});
+    $this->assertEquals($this->route->matches('POST', '/first/second'), false);
+  }
+  
+  public function testMatchesShouldBeFalseWhenPatternDoesNotMatch()
   {
     $this->route->build('GET', '/hello', function(){});
-    $this->assertEquals($this->route->match('POST', '/hello'), false);
+    $this->assertEquals($this->route->matches('GET', '/wrong'), false);
   }
   
-  public function testMatchPatternShouldBeTrueWhenConditionsMet()
+  public function testMatchesShouldBeTrueWhenConditionsMet()
   {
     $this->route->build('GET', '/hello/:id', function(){}, array(':id' => '[0-9]+'));
-    $this->assertEquals($this->route->match('GET', '/hello/21'), true);
+    $this->assertEquals($this->route->matches('GET', '/hello/21'), true);
   }
   
-  public function testMatchPatternShouldBeFalseWhenConditionsNotMet()
+  public function testMatchesShouldBeFalseWhenConditionsNotMet()
   {
     $this->route->build('GET', '/hello/:id', function(){}, array(':id' => '[0-9]+'));
-    $this->assertEquals($this->route->match('GET', '/hello/21a43'), false);
+    $this->assertEquals($this->route->matches('GET', '/hello/21a43'), false);
+  }
+  
+  public function testShouldGetParams()
+  {
+    $this->route->build('GET', '/hello/:id/:name', function(){}, array(':id' => '[0-9]+'));
+    $this->route->matches('GET', '/hello/21/Tom');
+    $params = $this->route->getParams();
+    $this->assertEquals($params[':id'], '21');
+    $this->assertEquals($params[':name'], 'Tom');
   }
 }
 ?>
