@@ -5,6 +5,8 @@
     private $_parts;
     private $_params;
     
+    // testing prose
+    
     public function __construct($method, $pattern, Closure $callback, Array $conditions = null){
       $this->_parts = array();
       $this->_params = array();
